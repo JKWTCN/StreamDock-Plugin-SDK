@@ -69,8 +69,7 @@ void ConnectionManager::SetImage(const QString &inBase64ImageString,
     jsonObject[mSDKCommonContext] = inContext;
     QJsonObject payload;
     payload[mSDKPayloadTarget] = inTarget;
-    const QString prefix = "data:image/png;base64,";
-    if (inBase64ImageString.isEmpty() || inBase64ImageString.startsWith(prefix)) {
+    if (inBase64ImageString.isEmpty() || inBase64ImageString.startsWith("data:image/")) {
         payload[mSDKPayloadImage] = inBase64ImageString;
     } else {
         payload[mSDKPayloadImage] = "data:image/png;base64," + inBase64ImageString;
@@ -232,7 +231,7 @@ void ConnectionManager::OnMessage(const QString &message)
             mPlugin->SystemDidWakeUp();
         } else if (event == mSDKEventDialDown) {
             mPlugin->DialDownForAction(action, context, payload, deviceID);
-        } else if (event == mSDKEventDialDown) {
+        } else if (event == mSDKEventDialUp) {
             mPlugin->DialUpForAction(action, context, payload, deviceID);
         } else if (event == mSDKEventDialRotate) {
             mPlugin->DialRotateForAction(action, context, payload, deviceID);

@@ -1,9 +1,11 @@
 # websocket
-QT += websockets
+QT += core websockets
+QT -= gui
 
 CONFIG += c++11
 
 HEADERS += \
+    $$PWD/KnobFeedback.h \
     $$PWD/Action.h \
     $$PWD/BasePlugin.h \
     $$PWD/ConnectionManager.h \
@@ -14,6 +16,7 @@ HEADERS += \
     $$PWD/SDKDefines.h
 
 SOURCES += \
+    $$PWD/KnobFeedback.cpp \
     $$PWD/Action.cpp \
     $$PWD/BasePlugin.cpp \
     $$PWD/ConnectionManager.cpp \
@@ -23,3 +26,13 @@ SOURCES += \
     $$PWD/Plugin.cpp
 
 INCLUDEPATH += $$PWD
+INCLUDEPATH += $$PWD/../third_party
+win32:DEFINES += SPDLOG_WCHAR_FILENAMES NOMINMAX WIN32_LEAN_AND_MEAN
+win32 {
+    SOURCES += $$PWD/KnobFeedbackWindows.cpp
+    LIBS += -lgdiplus -lole32
+}
+macx {
+    SOURCES += $$PWD/KnobFeedbackMac.cpp
+    LIBS += -framework CoreGraphics -framework CoreText -framework ImageIO -framework CoreFoundation
+}

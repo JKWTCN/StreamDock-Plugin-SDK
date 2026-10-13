@@ -2,6 +2,7 @@
 #include <QCoreApplication>
 #include <QFile>
 #include <QJsonDocument>
+#include <QDir>
 
 static Localizer *sLocalizer = nullptr;
 
@@ -24,7 +25,11 @@ QString Localizer::GetLocalizedString(const QString &inDefaultString)
 Localizer::Localizer(const QString &inLanguageCode)
 {
     try {
-        QString pluginPath = qApp->applicationDirPath();
+        QDir pluginDir(qApp->applicationDirPath());
+        for (int depth = 0; depth < 6 && !pluginDir.exists("manifest.json"); ++depth) {
+            if (!pluginDir.cdUp()) break;
+        }
+        QString pluginPath = pluginDir.absolutePath() + "/";
         if (!inLanguageCode.isEmpty() && !pluginPath.isEmpty()) {
             QString localizationFilePath = pluginPath + inLanguageCode + ".json";
             QFile file(localizationFilePath);

@@ -2,6 +2,7 @@
 #define ACTION_H
 
 #include "SDKDefines.h"
+#include "KnobFeedback.h"
 #include <QJsonObject>
 #include <QString>
 
@@ -39,6 +40,9 @@ protected:
     void SetState(int state);
     void SetTitle(const QString &title, mSDKTarget = mSDKTarget_HardwareAndSoftware, int state = -1);
     void SetImage(const QString &inBase64ImageString, mSDKTarget = mSDKTarget_HardwareAndSoftware, int state = -1);
+    bool SetFeedbackLayout(const QString &layoutPath, const QSize &outputSize = QSize(200, 100));
+    bool SetFeedbackLayout(const QJsonObject &layout, const QSize &outputSize = QSize(200, 100), const QString &assetRoot = QString());
+    bool SetFeedback(const QJsonObject &feedback, bool force = false);
     void ShowAlert();
     void ShowOK();
     void SetSettings(const QJsonObject &inPayload);
@@ -47,6 +51,8 @@ protected:
 private:
     QString mAction;
     QString mContext;
+    QString mLastKnobImage;
+    FeedbackLayout mFeedbackLayout;
     ConnectionManager *mConnectionManager = nullptr;
 };
 

@@ -26,8 +26,7 @@ SOURCES += \
     $$PWD/Plugin.cpp
 
 INCLUDEPATH += $$PWD
-INCLUDEPATH += $$PWD/../third_party
-win32:DEFINES += SPDLOG_WCHAR_FILENAMES NOMINMAX WIN32_LEAN_AND_MEAN
+win32:DEFINES += NOMINMAX WIN32_LEAN_AND_MEAN
 win32 {
     SOURCES += $$PWD/KnobFeedbackWindows.cpp
     LIBS += -lgdiplus -lole32

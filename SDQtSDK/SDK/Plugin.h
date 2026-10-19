@@ -39,7 +39,7 @@ public:
                                    const QString &inContext,
                                    const QJsonObject &inPayload,
                                    const QString &inDeviceID) override;
-                                   
+
     virtual void DialUpForAction(const QString &inAction,
                                    const QString &inContext,
                                    const QJsonObject &inPayload,

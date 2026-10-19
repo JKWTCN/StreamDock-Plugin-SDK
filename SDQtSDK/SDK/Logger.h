@@ -9,10 +9,13 @@ class Logger
 {
 public:
     Logger() = delete;
+    using FileLogHandler = void (*)(const QString &message);
     static void SetConnectionManager(ConnectionManager *connection);
+    // Configure once at startup. A null handler restores Qt's default log output.
+    static void SetFileLogHandler(FileLogHandler handler);
 
     static void LogToServer(const QString &message);
-    // UTF-8 logs under the plugin's logs/photoshop_YYYY-MM-DD.log; rotates at local midnight.
+    // The application decides the logging backend, file location and rotation policy.
     static void LogToFile(const QString &message);
 };
 

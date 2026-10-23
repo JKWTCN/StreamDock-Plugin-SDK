@@ -47,12 +47,19 @@ bool text(CGContextRef context, const FeedbackCommand &command, CGRect rect, CGC
     CTLineRef draw = truncated ? truncated.get() : line.get();
     CGFloat ascent = 0, descent = 0;
     width = CTLineGetTypographicBounds(draw, &ascent, &descent, nullptr);
+    const double scale = command.overflow == "fit" ? qMin(1.0, qMin(
+        rect.size.width / qMax(1.0, width), rect.size.height / qMax(1.0, double(ascent + descent)))) : 1.0;
+    width *= scale;
+    ascent *= scale;
+    descent *= scale;
     CGContextSaveGState(context);
     CGContextClipToRect(context, rect);
     CGContextSetTextMatrix(context, CGAffineTransformIdentity);
     const double x = command.alignment == "right" ? CGRectGetMaxX(rect) - width :
         command.alignment == "left" ? rect.origin.x : rect.origin.x + (rect.size.width - width) / 2;
-    CGContextSetTextPosition(context, x, rect.origin.y + (rect.size.height - ascent - descent) / 2 + descent);
+    CGContextTranslateCTM(context, x, rect.origin.y + (rect.size.height - ascent - descent) / 2 + descent);
+    CGContextScaleCTM(context, scale, scale);
+    CGContextSetTextPosition(context, 0, 0);
     CTLineDraw(draw, context);
     CGContextRestoreGState(context);
     return true;

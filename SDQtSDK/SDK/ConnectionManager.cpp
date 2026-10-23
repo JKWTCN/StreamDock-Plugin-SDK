@@ -33,7 +33,11 @@ void ConnectionManager::Run()
         mWebsocketClient = new QWebSocket();
         connect(mWebsocketClient, &QWebSocket::connected, this, &ConnectionManager::OnConnected);
         connect(mWebsocketClient, &QWebSocket::disconnected, this, &ConnectionManager::OnDisonnected);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+        connect(mWebsocketClient, &QWebSocket::errorOccurred, this, &ConnectionManager::OnError);
+#else
         connect(mWebsocketClient, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error), this, &ConnectionManager::OnError);
+#endif
         connect(mWebsocketClient, &QWebSocket::textMessageReceived, this, &ConnectionManager::OnMessage);
 
         QString urlString = QString("ws://127.0.0.1:%1").arg(mPort);
@@ -111,6 +115,12 @@ void ConnectionManager::GetGlobalSettings()
 {
     QJsonObject jsonObject{{mSDKCommonEvent, mSDKEventGetGlobalSettings}, {mSDKCommonContext, mPluginUUID}};
     SendMessage(QJsonDocument(jsonObject).toJson(QJsonDocument::Compact));
+}
+
+void ConnectionManager::GetSettings(const QString &inContext)
+{
+    const QJsonObject message{{mSDKCommonEvent, mSDKEventGetSettings}, {mSDKCommonContext, inContext}};
+    SendMessage(QJsonDocument(message).toJson(QJsonDocument::Compact));
 }
 
 void ConnectionManager::SetGlobalSettings(const QJsonObject &inPayload)

@@ -140,6 +140,11 @@ void Action::SetSettings(const QJsonObject &inPayload)
     GetConnectionManager()->SetSettings(inPayload, mContext);
 }
 
+void Action::GetSettings()
+{
+    GetConnectionManager()->GetSettings(mContext);
+}
+
 void Action::ShowAlert()
 {
     GetConnectionManager()->ShowAlertForContext(mContext);

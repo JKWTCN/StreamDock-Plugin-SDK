@@ -35,6 +35,7 @@ public:
     void SetSettings(const QJsonObject &inPayload,
                      const QString &inContext);
     void GetGlobalSettings();
+    void GetSettings(const QString &inContext);
     void SetGlobalSettings(const QJsonObject &inPayload);
     void SetState(int inState, const QString &inContext);
     void SendToPropertyInspector(const QString &inAction,

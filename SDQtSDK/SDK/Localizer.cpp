@@ -3,6 +3,7 @@
 #include <QFile>
 #include <QJsonDocument>
 #include <QDir>
+#include <QStringList>
 
 static Localizer *sLocalizer = nullptr;
 
@@ -24,27 +25,23 @@ QString Localizer::GetLocalizedString(const QString &inDefaultString)
 
 Localizer::Localizer(const QString &inLanguageCode)
 {
-    try {
-        QDir pluginDir(qApp->applicationDirPath());
-        for (int depth = 0; depth < 6 && !pluginDir.exists("manifest.json"); ++depth) {
-            if (!pluginDir.cdUp()) break;
-        }
-        QString pluginPath = pluginDir.absolutePath() + "/";
-        if (!inLanguageCode.isEmpty() && !pluginPath.isEmpty()) {
-            QString localizationFilePath = pluginPath + inLanguageCode + ".json";
-            QFile file(localizationFilePath);
-            if (file.open(QFile::ReadOnly)) {
-                QJsonDocument languageJsonDocument = QJsonDocument::fromJson(file.readAll());
-                QJsonObject languageJsonObject = languageJsonDocument.object();
-                if (languageJsonObject.contains("Localization")) {
-                    mLocalizationData = languageJsonObject.value("Localization").toObject();
-                } else {
-                    mLocalizationData = QJsonObject();
-                }
-            }
-            file.close();
-        }
-    } catch (...) {
+    QDir pluginDir(qApp->applicationDirPath());
+    for (int depth = 0; depth < 6 && !pluginDir.exists("manifest.json"); ++depth) {
+        if (!pluginDir.cdUp()) break;
+    }
+    const QString primary = QString(inLanguageCode).trimmed().toLower().replace('-', '_').section('_', 0, 0);
+    const QStringList supported{"en", "de", "es", "fr", "ja", "ko"};
+    const QString language = primary == "zh" ? "zh_CN" : supported.contains(primary) ? primary : "en";
+    auto load = [&pluginDir](const QString &code) {
+        QFile file(pluginDir.filePath(code + ".json"));
+        if (!file.open(QFile::ReadOnly)) return QJsonObject();
+        return QJsonDocument::fromJson(file.readAll()).object().value("Localization").toObject();
+    };
+    mLocalizationData = load("en");
+    if (language != "en") {
+        const auto translated = load(language);
+        for (auto it = translated.begin(); it != translated.end(); ++it)
+            if (it.value().isString() && !it.value().toString().isEmpty()) mLocalizationData.insert(it.key(), it.value());
     }
 }
 

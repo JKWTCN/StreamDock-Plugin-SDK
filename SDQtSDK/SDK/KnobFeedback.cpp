@@ -150,7 +150,7 @@ bool validate(const QJsonObject &layout, QString &error) {
             const auto alignment = item.value("alignment").toString("center");
             if (alignment != "left" && alignment != "right" && alignment != "center") return fail("Invalid alignment: " + key);
             const auto overflow = item.value("text-overflow").toString("clip");
-            if (overflow != "clip" && overflow != "ellipsis") return fail("Only clip/ellipsis text overflow is supported: " + key);
+            if (overflow != "clip" && overflow != "ellipsis" && overflow != "fit") return fail("Only clip/ellipsis/fit text overflow is supported: " + key);
         }
     }
     return true;

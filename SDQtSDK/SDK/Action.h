@@ -46,6 +46,7 @@ protected:
     void ShowAlert();
     void ShowOK();
     void SetSettings(const QJsonObject &inPayload);
+    void GetSettings();
     void SendToPropertyInspector(const QJsonObject &inPayload);
 
 private:

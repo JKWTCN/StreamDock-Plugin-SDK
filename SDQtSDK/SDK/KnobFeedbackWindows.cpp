@@ -65,8 +65,22 @@ bool text(Gdiplus::Graphics &graphics, const FeedbackCommand &command, const Gdi
     const auto wide = command.text.toStdWString();
     const Gdiplus::FontFamily family(L"Segoe UI");
     const auto *selected = family.GetLastStatus() == Gdiplus::Ok ? &family : Gdiplus::FontFamily::GenericSansSerif();
-    Gdiplus::Font font(selected, static_cast<Gdiplus::REAL>(command.fontSize),
-        command.fontWeight >= 600 ? Gdiplus::FontStyleBold : Gdiplus::FontStyleRegular, Gdiplus::UnitPixel);
+    const auto style = command.fontWeight >= 600 ? Gdiplus::FontStyleBold : Gdiplus::FontStyleRegular;
+    Gdiplus::REAL size = static_cast<Gdiplus::REAL>(command.fontSize);
+    if (command.overflow == "fit") {
+        // Measure with the same font and format used for drawing, including glyph padding.
+        for (int attempt = 0; attempt < 3; ++attempt) {
+            Gdiplus::Font candidate(selected, size, style, Gdiplus::UnitPixel);
+            Gdiplus::RectF bounds;
+            if (candidate.GetLastStatus() != Gdiplus::Ok || graphics.MeasureString(wide.c_str(),
+                static_cast<INT>(wide.size()), &candidate, Gdiplus::PointF(0, 0), &format, &bounds) != Gdiplus::Ok) return false;
+            const auto scale = qMin(1.0f, qMin(rect.Width / qMax(1.0f, bounds.Width),
+                rect.Height / qMax(1.0f, bounds.Height)));
+            if (scale >= 1.0f) break;
+            size *= scale * 0.98f;
+        }
+    }
+    Gdiplus::Font font(selected, size, style, Gdiplus::UnitPixel);
     if (font.GetLastStatus() != Gdiplus::Ok) return false;
     const auto saved = graphics.Save();
     graphics.SetClip(rect, Gdiplus::CombineModeIntersect);
